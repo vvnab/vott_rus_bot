@@ -25,26 +25,31 @@ const checkNewPosts = () => {
       try {
         const doc = new dom().parseFromString(result);
         // список постов
-        const posts = select(doc, "//item/link/text()");
+        const posts = select(doc, "//item");
         // список URL постов
-        const newPosts = _.map(posts, i => i.nodeValue);
+        const newUrls = _.map(posts, i => i.getElementsByTagName('link')[0].childNodes[0].nodeValue);
         // посты с прошлой загрузки (читаем из .data/lastPosts)
-        const lastPosts = readLastPosts();
-        // пишем посты в .data/lastPosts
-        writeLastPosts(newPosts);
+        const lastUrls = readLastPosts();
+        // пишем посты в .data/lastPosts 
+        writeLastPosts(newUrls);
         // новые посты
-        const urls = _.differenceWith(newPosts, lastPosts, (a, b) => {
-          a = a ? parseInt(_.last(a.split('/'))) : 0;
-          b = b ? parseInt(_.last(b.split('/'))) : 0;
-          return a <= b;
-        }).reverse();
+        const urls = _.difference(newUrls, lastUrls).sort();
         // отправляем в Телеграм новые посты
-        Promise.mapSeries(urls, i => bot.sendMessage(chatId, i))
+        Promise.mapSeries(urls, (i, k) => {
+          const post = _.find(posts, p => p.getElementsByTagName('link')[0].childNodes[0].nodeValue == i);
+          const url = post.getElementsByTagName('link')[0].childNodes[0].nodeValue;
+          const title = post.getElementsByTagName('title')[0].childNodes[0].nodeValue;
+          const description = post.getElementsByTagName('description')[0].childNodes[0].nodeValue;
+          const message = `<b>${title}</b>\n${url}`;
+          return bot.sendMessage(chatId, message, {
+            parse_mode: 'HTML'
+          });
+        })
           .then(messages => {
             console.log(`${messages.length} sended`);
           })
           .catch(error => {
-            console.error(error)
+            console.error(error);
           });
       } catch (error) {
         console.error(error);
@@ -56,4 +61,4 @@ const checkNewPosts = () => {
 }
 
 checkNewPosts();
-setTimeout(checkNewPosts, 1000 * 60 * 1);
+setInterval(checkNewPosts, 1000 * 60 * 10);
