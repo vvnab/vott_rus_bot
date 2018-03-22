@@ -1,21 +1,20 @@
+require('./utils/loadSettings');
 const TelegramBot = require('node-telegram-bot-api');
 const request = require('request-promise');
 const dom = require('xmldom').DOMParser;
 const select = require('xpath.js');
 const Promise = require('bluebird');
+const moment = require('moment');
+moment.locale('ru');
 const _ = require('lodash');
 const readLastPosts = require('./utils/rwLastPosts').readLastPosts;
 const writeLastPosts = require('./utils/rwLastPosts').writeLastPosts;
 
-// replace the value below with the Telegram token you receive from @BotFather
-const token = '510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E';
 
 // Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, {
+const bot = new TelegramBot(settings.token, {
   polling: true
 });
-
-const chatId = '@vott_rus';
 
 bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
@@ -39,9 +38,10 @@ const checkNewPosts = () => {
           const post = _.find(posts, p => p.getElementsByTagName('link')[0].childNodes[0].nodeValue == i);
           const url = post.getElementsByTagName('link')[0].childNodes[0].nodeValue;
           const title = post.getElementsByTagName('title')[0].childNodes[0].nodeValue;
-          const description = post.getElementsByTagName('description')[0].childNodes[0].nodeValue;
-          const message = `<b>${title}</b>\n${url}`;
-          return bot.sendMessage(chatId, message, {
+          const description = post.getElementsByTagName('description')[0].childNodes[0].nextSibling.data.toString();
+          const pubDate = moment(post.getElementsByTagName('pubDate')[0].childNodes[0].nodeValue).format('DD MMMM YYYY HH:ss');
+          const message = `<b>${title}</b>\n${pubDate}\n${url}`;
+          return bot.sendMessage(settings.chatId, message, {
             parse_mode: 'HTML'
           });
         })
@@ -61,4 +61,4 @@ const checkNewPosts = () => {
 }
 
 checkNewPosts();
-setInterval(checkNewPosts, 1000 * 60 * 10);
+setInterval(checkNewPosts, 1000 * settings.checkInterval);
