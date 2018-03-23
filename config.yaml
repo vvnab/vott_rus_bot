@@ -7,9 +7,7 @@ develop:
   # интервал проверки новых сообщений в секундах
   checkInterval: 60
 production:
-  token: "590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw"
-  chatId: "@vott_dev"
-  # token: "510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E"
-  # chatId: "@vott_rus"
+  token: "510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E"
+  chatId: "@vott_rus"
   # интервал проверки новых сообщений в секундах
   checkInterval: 600
