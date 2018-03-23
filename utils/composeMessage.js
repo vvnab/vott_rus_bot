@@ -4,7 +4,7 @@ const _ = require('lodash');
 const composeMessage = post => {
   let message;
   if (post.href) {
-    const R = post.title.match(/r/i);
+    const R = post.title.match(/\[r\]/i);
     post.title = _.escape(post.title);
     message = R
       ? `<b>${post.title}</b>\n<i>${post.topic}</i> | ${post.author}\n${post.link}`
