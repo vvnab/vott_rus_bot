@@ -1,15 +1,10 @@
 require('./utils/loadSettings');
 const TelegramBot = require('node-telegram-bot-api');
-const request = require('request-promise');
-const dom = require('xmldom').DOMParser;
-const select = require('xpath.js');
 const Promise = require('bluebird');
-const moment = require('moment');
-moment.locale('ru');
 const _ = require('lodash');
-const readLastPosts = require('./utils/rwLastPosts').readLastPosts;
-const writeLastPosts = require('./utils/rwLastPosts').writeLastPosts;
-
+const store = require('./utils/store');
+const fetch = require('./utils/fetch');
+const composeMessage = require('./utils/composeMessage');
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
@@ -19,46 +14,79 @@ const bot = new TelegramBot(settings.token, {
 bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
 const checkNewPosts = () => {
-  request('http://vott.ru/rss.xml')
-    .then(result => {
-      try {
-        const doc = new dom().parseFromString(result);
-        // список постов
-        const posts = select(doc, "//item");
-        // список URL постов
-        const newUrls = _.map(posts, i => i.getElementsByTagName('link')[0].childNodes[0].nodeValue);
-        // посты с прошлой загрузки (читаем из .data/lastPosts)
-        const lastUrls = readLastPosts();
-        // пишем посты в .data/lastPosts 
-        writeLastPosts(newUrls);
-        // новые посты
-        const urls = _.difference(newUrls, lastUrls).sort();
-        // отправляем в Телеграм новые посты
-        Promise.mapSeries(urls, (i, k) => {
-          const post = _.find(posts, p => p.getElementsByTagName('link')[0].childNodes[0].nodeValue == i);
-          const url = post.getElementsByTagName('link')[0].childNodes[0].nodeValue;
-          const title = post.getElementsByTagName('title')[0].childNodes[0].nodeValue;
-          const description = post.getElementsByTagName('description')[0].childNodes[0].nextSibling.data.toString();
-          const pubDate = moment(post.getElementsByTagName('pubDate')[0].childNodes[0].nodeValue).format('DD MMMM YYYY HH:ss');
-          const message = `<b>${title}</b>\n${pubDate}\n${url}`;
-          return bot.sendMessage(settings.chatId, message, {
-            parse_mode: 'HTML'
-          });
-        })
-          .then(messages => {
-            console.log(`${messages.length} sended`);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      } catch (error) {
-        console.error(error);
-      }
+  Promise.all([fetch.rssUpdate(), fetch.htmlUpdate(), store.readLastPosts()])
+    .then(results => {
+      // process.abort();
+      // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
+      const rssPosts = results[0];
+      const htmlPosts = results[1];
+      const prevPosts = results[2];
+      // выполняем слияние
+      const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
+      // сравниваем
+      const posts = _.differenceBy(newPosts, prevPosts, 'id').sort();
+      // формируем сообщениz
+      const messages = _.map(posts, composeMessage);
+      // постим
+      return Promise.mapSeries(messages, i => bot.sendMessage(settings.chatId, i, {
+        parse_mode: 'HTML'
+      }))
+        .then(result => [result, newPosts]);
+    })
+    .then(results => {
+      console.log(`success sended ${results[0].length} posts`);
+      const newPosts = results[1];
+      // сохраняем ...
+      store.saveLastPosts(newPosts);
     })
     .catch(error => {
       console.error(error);
     });
 }
 
-checkNewPosts();
-setInterval(checkNewPosts, 1000 * settings.checkInterval);
+const checkNewPosts2 = () => {
+  store.readLastPosts()
+    .then(prevPosts => {
+      return fetch.rssUpdate()
+        .then(result => [result, prevPosts])
+        .catch(error => {
+          console.error(error);
+          return [[], prevPosts];
+        });
+    })
+    .then(results => {
+      return fetch.htmlUpdate()
+        .then(result => [result, ...results])
+        .catch(error => {
+          console.error(error);
+          return [[], ...results];
+        })
+    })
+    .then(results => {
+      // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
+      const htmlPosts = results[0];
+      const rssPosts = results[1];
+      const prevPosts = results[2];
+      // выполняем слияние
+      const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
+      // сравниваем
+      const posts = _.sortBy(_.differenceBy(newPosts, prevPosts, 'id'), 'id');
+      // формируем сообщениz
+      const messages = _.map(posts, composeMessage);
+      // сохраняем ...
+      store.saveLastPosts(newPosts);
+      // постим
+      return Promise.mapSeries(messages, i => bot.sendMessage(settings.chatId, i, {
+        parse_mode: 'HTML'
+      }));
+    })
+    .then(result => {
+      console.log(`success sended ${result.length} posts`);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
+
+checkNewPosts2();
+setInterval(checkNewPosts2, 1000 * settings.checkInterval);
