@@ -8,7 +8,7 @@ const composeMessage = post => {
     post.title = _.escape(post.title);
     message = R
       ? `<b>${post.title}</b>\n<i>${post.topic}</i> | ${post.author}\n${post.link}`
-      : `<b>${post.title}</b> <a href='${post.href}'> > пройти по ссылке</a>\n<i>${post.topic}</i> | ${post.author}\n${post.link}`
+      : `<a href='${post.href}'>${post.title}</a>\n<i>${post.topic}</i> | ${post.author}\n${post.link}`
   } else {
     // .format('DD MMMM YYYY HH:ss')
     message = `${post.title}\n${post.link}`
