@@ -10,4 +10,4 @@ production:
   token: "510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E"
   chatId: "@vott_rus"
   # интервал проверки новых сообщений в секундах
-  checkInterval: 600
+  checkInterval: 300
