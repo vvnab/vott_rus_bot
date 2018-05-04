@@ -14,38 +14,8 @@ const bot = new TelegramBot(settings.token, {
 bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
 const checkNewPosts = () => {
-  Promise.all([fetch.rssUpdate(), fetch.htmlUpdate(), store.readLastPosts()])
-    .then(results => {
-      // process.abort();
-      // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
-      const rssPosts = results[0];
-      const htmlPosts = results[1];
-      const prevPosts = results[2];
-      // выполняем слияние
-      const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
-      // сравниваем
-      const posts = _.differenceBy(newPosts, prevPosts, 'id').sort();
-      // формируем сообщениz
-      const messages = _.map(posts, composeMessage);
-      // постим
-      return Promise.mapSeries(messages, i => bot.sendMessage(settings.chatId, i, {
-        parse_mode: 'HTML'
-      }))
-        .then(result => [result, newPosts]);
-    })
-    .then(results => {
-      console.log(`success sended ${results[0].length} posts`);
-      const newPosts = results[1];
-      // сохраняем ...
-      store.saveLastPosts(newPosts);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-}
-
-const checkNewPosts2 = () => {
   store.readLastPosts()
+    .bind({})
     .then(prevPosts => {
       return fetch.rssUpdate()
         .then(result => [result, prevPosts])
@@ -74,14 +44,15 @@ const checkNewPosts2 = () => {
       // формируем сообщениz
       const messages = _.map(posts, composeMessage);
       // сохраняем ...
-      const savePosts = _.sortBy(_.unionBy(newPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50);
-      store.saveLastPosts(savePosts);
+      this.savePosts = _.sortBy(_.unionBy(newPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // постим
       return Promise.mapSeries(messages, i => bot.sendMessage(settings.chatId, i, {
         parse_mode: 'HTML'
       }));
     })
     .then(result => {
+      // сохраняем ...
+      store.saveLastPosts(this.savePosts);
       console.log(`success sended ${result.length} posts`);
     })
     .catch(error => {
@@ -89,5 +60,5 @@ const checkNewPosts2 = () => {
     });
 }
 
-checkNewPosts2();
-setInterval(checkNewPosts2, 1000 * settings.checkInterval);
+checkNewPosts();
+setInterval(checkNewPosts, 1000 * settings.checkInterval);
