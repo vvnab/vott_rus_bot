@@ -3,3 +3,9 @@
 Бот пока что самый примитивный. Если проявите интерес, буду пилить дальше.
 
 https://t.me/vott_rus
+
+# Установка 
+    git clone git@github.com:vvnab/vott_rus_bot.git
+    cd vott_rus_bot
+    npm install
+    npm start
