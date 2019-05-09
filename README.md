@@ -5,7 +5,7 @@
 https://t.me/vott_rus
 
 # Установка 
-    git clone git@github.com:vvnab/vott_rus_bot.git
+    git clone https://github.com/vvnab/vott_rus_bot.git
     cd vott_rus_bot
     npm install
     npm start
