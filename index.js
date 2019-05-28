@@ -8,7 +8,10 @@ const composeMessage = require('./utils/composeMessage');
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
-  polling: true
+  polling: true,
+  request: {                                                                                                                                                                                                      
+    proxy: setting.proxy                                                                                                                                                                           
+  }
 });
 
 bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
