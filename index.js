@@ -44,14 +44,12 @@ const checkNewPosts = () => {
       const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
       // сравниваем
       const posts = _.sortBy(_.differenceBy(newPosts, prevPosts, 'id'), 'id');
-      // формируем сообщениz
-      const messages = _.map(posts, composeMessage);
       // сохраняем ...
       this.savePosts = _.sortBy(_.unionBy(newPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // постим
-      return Promise.mapSeries(messages, i => {
+      return Promise.mapSeries(posts, i => {
         try {
-          return bot.sendMessage(settings.chatId, i, {
+          return bot.sendMessage(settings.chatId, composeMessage(i), {
             parse_mode: 'HTML'
           })
         } catch (e) {
