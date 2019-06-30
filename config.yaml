@@ -1,7 +1,7 @@
 common:
   htmlUrl: http://vott.ru
   rssUrl: http://vott.ru/rss.xml
-  proxy: http://68.183.188.100:3128/
+  proxy: http://83.168.85.35:8090
 develop:
   token: "590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw"
   chatId: "@vott_dev"
