@@ -10,7 +10,7 @@ const composeMessage = require('./utils/composeMessage');
 const bot = new TelegramBot(settings.token, {
   polling: true,
   request: {
-    proxy: setting.proxy
+    proxy: settings.proxy
   }
 });
 
