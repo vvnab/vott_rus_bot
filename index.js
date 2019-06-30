@@ -54,7 +54,7 @@ const checkNewPosts = () => {
           })
         } catch (e) {
           this.savePosts = _.remove(this.savePosts, ii => ii.id === i.id);
-          throw e;
+          return e;
         }
       });
     })
