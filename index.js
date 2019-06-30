@@ -9,8 +9,8 @@ const composeMessage = require('./utils/composeMessage');
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
   polling: true,
-  request: {                                                                                                                                                                                                      
-    proxy: settings.proxy                                                                                                                                                                           
+  request: {
+    proxy: settings.proxy
   }
 });
 
@@ -49,9 +49,16 @@ const checkNewPosts = () => {
       // сохраняем ...
       this.savePosts = _.sortBy(_.unionBy(newPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // постим
-      return Promise.mapSeries(messages, i => bot.sendMessage(settings.chatId, i, {
-        parse_mode: 'HTML'
-      }));
+      return Promise.mapSeries(messages, i => {
+        try {
+          return bot.sendMessage(settings.chatId, i, {
+            parse_mode: 'HTML'
+          })
+        } catch (e) {
+          this.savePosts = _.remove(this.savePosts, ii => ii.id === i.id);
+          throw e;
+        }
+      });
     })
     .then(result => {
       // сохраняем ...
@@ -59,6 +66,7 @@ const checkNewPosts = () => {
       console.log(`success sended ${result.length} posts`);
     })
     .catch(error => {
+      store.saveLastPosts(this.savePosts);
       console.error(error);
     });
 }
