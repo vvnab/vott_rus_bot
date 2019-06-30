@@ -40,6 +40,7 @@ const checkNewPosts = () => {
       const htmlPosts = results[0];
       const rssPosts = results[1];
       const prevPosts = results[2];
+      this.prevPosts = prevPosts;
       // выполняем слияние
       const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
       // сравниваем
@@ -68,7 +69,7 @@ const checkNewPosts = () => {
       console.log(`success sended ${result.length} posts`);
     })
     .catch(error => {
-      store.saveLastPosts(_.sortBy(_.unionBy(this.savedPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50));
+      store.saveLastPosts(_.sortBy(_.unionBy(this.savedPosts, this.prevPosts, 'id'), 'id').reverse().slice(0, 50));
       console.error(error);
     });
 }
