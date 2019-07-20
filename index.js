@@ -5,6 +5,7 @@ const _ = require('lodash');
 const store = require('./utils/store');
 const fetch = require('./utils/fetch');
 const composeMessage = require('./utils/composeMessage');
+const allSettled = require("promise.allsettled");
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
@@ -39,32 +40,27 @@ const checkNewPosts = () => {
       // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
       const htmlPosts = results[0];
       const rssPosts = results[1];
-      const prevPosts = results[2];
+      this.prevPosts = results[2];
       // выполняем слияние
-      const newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
+      this.newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
       // сравниваем
-      const posts = _.sortBy(_.differenceBy(newPosts, prevPosts, 'id'), 'id');
-      // сохраняем ...
-      this.savePosts = _.sortBy(_.unionBy(newPosts, prevPosts, 'id'), 'id').reverse().slice(0, 50);
+      this.posts = _.sortBy(_.differenceBy(this.newPosts, this.prevPosts, 'id'), 'id');
       // постим
-      return Promise.mapSeries(posts, i => {
-        try {
-          return bot.sendMessage(settings.chatId, composeMessage(i), {
-            parse_mode: 'HTML'
-          })
-        } catch (e) {
-          this.savePosts = _.remove(this.savePosts, ii => ii.id === i.id);
-          return e;
-        }
-      });
+      return allSettled(this.posts.map(i => bot.sendMessage(settings.chatId, composeMessage(i), { parse_mode: 'HTML' })))
     })
     .then(result => {
+      result.forEach((i, k) => {
+        if (i.status === 'rejected') {
+          this.posts.splice(k, 1);
+        }
+      });
+      // что подлежит сохранению
+      const savePosts = _.sortBy(_.unionBy(this.posts, this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // сохраняем ...
-      store.saveLastPosts(this.savePosts);
-      console.log(`success sended ${result.length} posts`);
+      store.saveLastPosts(savePosts);
+      console.log(`success sended and saved ${this.posts.length}, rejected ${result.length - this.posts.length}`);
     })
     .catch(error => {
-      store.saveLastPosts(this.savePosts);
       console.error(error);
     });
 }
