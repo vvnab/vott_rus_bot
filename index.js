@@ -51,11 +51,11 @@ const checkNewPosts = () => {
     .then(result => {
       result.forEach((i, k) => {
         if (i.status === 'rejected') {
-          this.posts.splice(k, 1);
+          this.posts.splice(k, 1, null);
         }
       });
       // что подлежит сохранению
-      const savePosts = _.sortBy(_.unionBy(this.posts, this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
+      const savePosts = _.sortBy(_.unionBy(_.compact(this.posts), this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // сохраняем ...
       store.saveLastPosts(savePosts);
       console.log(`success sended and saved ${this.posts.length}, rejected ${result.length - this.posts.length}`);
