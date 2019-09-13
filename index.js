@@ -1,12 +1,11 @@
 require('./utils/loadSettings');
-const TelegramBot = require('node-telegram-bot-api');
-const Promise = require('bluebird');
 const _ = require('lodash');
 const store = require('./utils/store');
 const fetch = require('./utils/fetch');
 const composeMessage = require('./utils/composeMessage');
 const allSettled = require("promise.allsettled");
-const moment = require("moment");
+process.env.NTBA_FIX_319 = 1;
+const TelegramBot = require('node-telegram-bot-api');
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
@@ -60,7 +59,7 @@ const checkNewPosts = () => {
       const savePosts = _.sortBy(_.unionBy(sendedPost, this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // сохраняем ...
       store.saveLastPosts(savePosts);
-      console.log(`${moment().format('YYYY-MM-DD HH:mm')} | success sended and saved ${sendedPost.length}, rejected ${result.length - sendedPost.length}`);
+      console.log(`success sended and saved ${sendedPost.length}, rejected ${result.length - sendedPost.length}`);
     })
     .catch(error => {
       console.error(error);

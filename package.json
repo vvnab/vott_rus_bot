@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1",
     "cheerio": "^1.0.0-rc.2",
     "install": "^0.10.4",
     "js-yaml": "^3.11.0",
