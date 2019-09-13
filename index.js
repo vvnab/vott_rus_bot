@@ -54,11 +54,12 @@ const checkNewPosts = () => {
           this.posts.splice(k, 1, null);
         }
       });
+      const sendedPost = _.compact(this.posts);
       // что подлежит сохранению
-      const savePosts = _.sortBy(_.unionBy(_.compact(this.posts), this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
+      const savePosts = _.sortBy(_.unionBy(sendedPost, this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // сохраняем ...
       store.saveLastPosts(savePosts);
-      console.log(`success sended and saved ${this.posts.length}, rejected ${result.length - this.posts.length}`);
+      console.log(`${new Date()} success sended and saved ${sendedPost.length}, rejected ${result.length - sendedPost.length}`);
     })
     .catch(error => {
       console.error(error);
