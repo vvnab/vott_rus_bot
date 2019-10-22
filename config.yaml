@@ -1,14 +1,13 @@
 common:
-  htmlUrl: http://vott.ru
-  rssUrl: http://vott.ru/rss.xml
-  proxy: http://86.57.181.122:46409
+  getProxyUrl: 'https://api.getproxylist.com/proxy?protocol=http'
+  htmlUrl: 'http://vott.ru'
+  rssUrl: 'http://vott.ru/rss.xml'
+  proxy: '182.16.181.90:54944'
 develop:
-  token: "590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw"
-  chatId: "@vott_dev"
-  # интервал проверки новых сообщений в секундах
+  token: '590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw'
+  chatId: '@vott_dev'
   checkInterval: 60
 production:
-  token: "510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E" 
-  chatId: "@vott_rus"
-  # интервал проверки новых сообщений в секундах
+  token: '510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E'
+  chatId: '@vott_rus'
   checkInterval: 600

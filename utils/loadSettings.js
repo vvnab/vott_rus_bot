@@ -1,5 +1,5 @@
-yaml = require('js-yaml');
-fs = require('fs');
+const yaml = require('js-yaml');
+const fs = require('fs');
 const _ = require('lodash');
 
 // Get document, or throw exception on error
