@@ -6,7 +6,7 @@ const composeMessage = require('./utils/composeMessage');
 const allSettled = require("promise.allsettled");
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
-const { exec } = require('child_process');
+const child_process = require('child_process');
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
@@ -63,7 +63,7 @@ const checkNewPosts = () => {
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
       if (rejectedCount > 0) {
-        exec('node ./changeProxy.js');
+        child_process.exec('node ./changeProxy.js');
       }
     })
     .catch(error => {
