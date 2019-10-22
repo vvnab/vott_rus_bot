@@ -63,6 +63,7 @@ const checkNewPosts = () => {
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
       if (rejectedCount > 0) {
+        console.warn(`changing proxy...`);
         child_process.exec('node ./changeProxy.js');
       }
     })

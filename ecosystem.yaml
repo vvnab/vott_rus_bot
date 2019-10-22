@@ -1,0 +1,9 @@
+apps:
+- name:             vott_rus_bot
+  cwd:              vott_rus_bot
+  script:           index.js
+  watch:            ["config.yaml"]
+  time: true
+  log_date_format:  "YYYY-MM-DD HH:mm"
+  env:                                                                                                                                                                                                            
+    NODE_ENV:       production
