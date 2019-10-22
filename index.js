@@ -6,10 +6,11 @@ const composeMessage = require('./utils/composeMessage');
 const allSettled = require("promise.allsettled");
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
+const { exec } = require('child_process');
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
-  polling: true,
+  polling: false,
   request: {
     proxy: settings.proxy
   }
@@ -59,7 +60,11 @@ const checkNewPosts = () => {
       const savePosts = _.sortBy(_.unionBy(sendedPost, this.prevPosts, 'id'), 'id').reverse().slice(0, 50);
       // сохраняем ...
       store.saveLastPosts(savePosts);
-      console.log(`success sended and saved ${sendedPost.length}, rejected ${result.length - sendedPost.length}`);
+      var rejectedCount = result.length - sendedPost.length;
+      console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
+      if (rejectedCount > 0) {
+        exec('node ./changeProxy.js');
+      }
     })
     .catch(error => {
       console.error(error);
