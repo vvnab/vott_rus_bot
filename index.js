@@ -64,7 +64,7 @@ const checkNewPosts = () => {
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
       if (rejectedCount > 0) {
         console.log(`changing proxy...`);
-        exec(`node .changeProxy.js`, function(error, stdout, stderr) {
+        exec(`node ./changeProxy.js`, function(error, stdout, stderr) {
           if (error) {
             console.error(`changing proxy error: ${error.message}`);
           } else {
