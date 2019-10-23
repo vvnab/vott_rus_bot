@@ -1,8 +1,9 @@
 common:
+  errorsForReloadProxy: 5
   getProxyUrl: 'https://api.getproxylist.com/proxy?protocol=http'
   htmlUrl: 'http://vott.ru'
   rssUrl: 'http://vott.ru/rss.xml'
-  proxy: '182.16.181.90:54944'
+  proxy: 'http://213.163.122.194:8080'
 develop:
   token: '590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw'
   chatId: '@vott_dev'

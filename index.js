@@ -62,7 +62,7 @@ const checkNewPosts = () => {
       store.saveLastPosts(savePosts);
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
-      if (rejectedCount > 0) {
+      if (rejectedCount >= settings.errorsForReloadProxy) {
         console.log(`changing proxy...`);
         exec(`node ./changeProxy.js`, function(error, stdout, stderr) {
           if (error) {
