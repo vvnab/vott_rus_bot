@@ -68,8 +68,8 @@ const checkNewPosts = () => {
           if (error) {
             console.error(`changing proxy error: ${error.message}`);
           } else {
-            console.log(`stdout: ${stdout}`);
-            console.error(`stderr: ${stderr}`);            
+            console.log(`changeProxy stdout: ${stdout}`);
+            console.error(`changeProxy stderr: ${stderr}`);            
           }
         });
       }
