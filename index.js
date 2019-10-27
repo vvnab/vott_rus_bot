@@ -8,6 +8,8 @@ process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 const { exec } = require('child_process');
 
+let errorCount = 0;
+
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
   polling: false,
@@ -18,10 +20,23 @@ const bot = new TelegramBot(settings.token, {
 
 bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
+const reloadProxy = () => {
+  console.log(`changing proxy...`);
+  exec(`node ./changeProxy.js`, function(error, stdout, stderr) {
+    if (error) {
+      console.error(`changing proxy error: ${error.message}`);
+    } else {
+      console.log(`changeProxy stdout: ${stdout}`);
+      console.error(`changeProxy stderr: ${stderr}`);            
+    }
+  });
+}
+
 const checkNewPosts = () => {
   store.readLastPosts()
     .bind({})
     .then(prevPosts => {
+      // return [];
       return fetch.rssUpdate()
         .then(result => [result, prevPosts])
         .catch(error => {
@@ -46,6 +61,7 @@ const checkNewPosts = () => {
       this.newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
       // сравниваем
       this.posts = _.sortBy(_.differenceBy(this.newPosts, this.prevPosts, 'id'), 'id');
+      console.log(`Success loaded ${this.posts.length} new post(s)`);
       // постим
       return allSettled(this.posts.map(i => bot.sendMessage(settings.chatId, composeMessage(i), { parse_mode: 'HTML' })))
     })
@@ -63,19 +79,16 @@ const checkNewPosts = () => {
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
       if (rejectedCount >= settings.errorsForReloadProxy) {
-        console.log(`changing proxy...`);
-        exec(`node ./changeProxy.js`, function(error, stdout, stderr) {
-          if (error) {
-            console.error(`changing proxy error: ${error.message}`);
-          } else {
-            console.log(`changeProxy stdout: ${stdout}`);
-            console.error(`changeProxy stderr: ${stderr}`);            
-          }
-        });
+        reloadProxy();
       }
     })
     .catch(error => {
       console.error(error);
+      console.log(`Fetch error number ${++errorCount}, to remain ${settings.errorsForReloadProxy - errorCount}...`);
+      if (errorCount >= settings.errorsForReloadProxy) {
+        errorCount = 0;
+        reloadProxy();
+      }
     });
 }
 

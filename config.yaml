@@ -1,13 +1,13 @@
 common:
   errorsForReloadProxy: 5
   getProxyUrl: 'https://api.getproxylist.com/proxy?protocol=http'
-  htmlUrl: 'http://vott.ru'
-  rssUrl: 'http://vott.ru/rss.xml'
-  proxy: 'http://213.163.122.194:8080'
+  htmlUrl: 'https://vott.ru'
+  rssUrl: 'https://vott.ru/rss.xml'
+  proxy: 'http://51.38.71.101:8080'
 develop:
   token: '590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw'
   chatId: '@vott_dev'
-  checkInterval: 60
+  checkInterval: 30
 production:
   token: '510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E'
   chatId: '@vott_rus'
