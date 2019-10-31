@@ -6,7 +6,7 @@ const cheerio = require('cheerio');
 const moment = require('moment');
 moment.locale('ru');
 
-const rssUpdate = () => {
+const rssUpdate = async () => {
   return request({
     proxy: settings.proxy,
     url: settings.rssUrl
@@ -29,14 +29,10 @@ const rssUpdate = () => {
     } catch (error) {
       console.error(error);
     }
-  })
-    .catch(error => {
-      console.error(error);
-    });
-
+  });
 }
 
-const htmlUpdate = () => {
+const htmlUpdate = async () => {
   return request({
     proxy: settings.proxy,
     url: settings.htmlUrl
@@ -55,10 +51,7 @@ const htmlUpdate = () => {
         author: $('span', i).eq(2).text()
       }
     })
-  })
-    .catch(error => {
-      console.error(error);
-    });
+  });
 }
 
 module.exports = {

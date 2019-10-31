@@ -38,19 +38,19 @@ const checkNewPosts = () => {
     .then(prevPosts => {
       // return [];
       return fetch.rssUpdate()
-        .then(result => [result, prevPosts])
-        .catch(error => {
-          console.error(error);
-          return [[], prevPosts];
-        });
+        .then(result => [result, prevPosts]);
+        // .catch(error => {
+        //   console.error(error);
+        //   return [[], prevPosts];
+        // });
     })
     .then(results => {
       return fetch.htmlUpdate()
-        .then(result => [result, ...results])
-        .catch(error => {
-          console.error(error);
-          return [[], ...results];
-        })
+        .then(result => [result, ...results]);
+        // .catch(error => {
+        //   console.error(error);
+        //   return [[], ...results];
+        // })
     })
     .then(results => {
       // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
@@ -61,7 +61,7 @@ const checkNewPosts = () => {
       this.newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
       // сравниваем
       this.posts = _.sortBy(_.differenceBy(this.newPosts, this.prevPosts, 'id'), 'id');
-      console.log(`Success loaded ${this.posts.length} new post(s)`);
+      console.log(`success loaded ${this.newPosts.length} post(s), ${this.posts.length} is new`);
       // постим
       return allSettled(this.posts.map(i => bot.sendMessage(settings.chatId, composeMessage(i), { parse_mode: 'HTML' })))
     })
@@ -78,14 +78,14 @@ const checkNewPosts = () => {
       store.saveLastPosts(savePosts);
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
-      if (rejectedCount >= settings.errorsForReloadProxy) {
+      if (rejectedCount >= settings.botErrorsForReloadProxy) {
         reloadProxy();
       }
     })
     .catch(error => {
       console.error(error);
-      console.log(`Fetch error number ${++errorCount}, to remain ${settings.errorsForReloadProxy - errorCount}...`);
-      if (errorCount >= settings.errorsForReloadProxy) {
+      console.log(`fetch error number ${++errorCount}, to remain ${settings.fetchErrorsForReloadProxy - errorCount}...`);
+      if (errorCount >= settings.fetchErrorsForReloadProxy) {
         errorCount = 0;
         reloadProxy();
       }
