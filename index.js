@@ -8,7 +8,7 @@ process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 const { exec } = require('child_process');
 
-let errorCount = 0;
+let fetchErrors = 0;
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(settings.token, {
@@ -53,6 +53,7 @@ const checkNewPosts = () => {
         // })
     })
     .then(results => {
+      fetchErrors = 0;
       // в result[] содержатся JSON объекты как в ./.data/lastPosts.json
       const htmlPosts = results[0];
       const rssPosts = results[1];
@@ -83,10 +84,10 @@ const checkNewPosts = () => {
       }
     })
     .catch(error => {
+      fetchErrors++;
       console.error(error);
-      console.log(`fetch error number ${++errorCount}, to remain ${settings.fetchErrorsForReloadProxy - errorCount}...`);
-      if (errorCount >= settings.fetchErrorsForReloadProxy) {
-        errorCount = 0;
+      console.log(`fetch error number ${fetchErrors}, to remain ${settings.fetchErrorsForReloadProxy - fetchErrors}...`);
+      if (fetchErrors >= settings.fetchErrorsForReloadProxy) {
         reloadProxy();
       }
     });

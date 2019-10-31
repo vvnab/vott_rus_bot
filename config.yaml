@@ -8,7 +8,7 @@ common:
 develop:
   token: '590210984:AAEOy4fh6iCkOq6h2VZbZdezIFsIDrYHXBw'
   chatId: '@vott_dev'
-  checkInterval: 90
+  checkInterval: 60
 production:
   token: '510786249:AAGD4bI7lFc444W5HzX-TaGhlTm7s1BlU1E'
   chatId: '@vott_rus'
