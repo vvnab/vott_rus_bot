@@ -8,7 +8,7 @@ moment.locale('ru');
 
 const rssUpdate = async () => {
   return request({
-    proxy: settings.proxy,
+    proxy: "http://" + _.last(settings.proxy),
     url: settings.rssUrl
   }).then(result => {
     try {
@@ -34,7 +34,7 @@ const rssUpdate = async () => {
 
 const htmlUpdate = async () => {
   return request({
-    proxy: settings.proxy,
+    proxy: "http://" + _.last(settings.proxy),
     url: settings.htmlUrl
   }).then(result => {
     const $ = cheerio.load(result);

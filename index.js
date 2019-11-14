@@ -14,7 +14,7 @@ let fetchErrors = 0;
 const bot = new TelegramBot(settings.token, {
   polling: false,
   request: {
-    proxy: settings.proxy
+    proxy: "http://" + _.last(settings.proxy),
   }
 });
 
@@ -22,7 +22,7 @@ bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
 const reloadProxy = () => {
   console.log(`changing proxy...`);
-  exec(`node ./changeProxy.js`, function(error, stdout, stderr) {
+  exec(`node ./shuffleProxy.js`, function(error, stdout, stderr) {
     if (error) {
       console.error(`changing proxy error: ${error.message}`);
     } else {
@@ -36,7 +36,6 @@ const checkNewPosts = () => {
   store.readLastPosts()
     .bind({})
     .then(prevPosts => {
-      // return [];
       return fetch.rssUpdate()
         .then(result => [result, prevPosts]);
         // .catch(error => {
