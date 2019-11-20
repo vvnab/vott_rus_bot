@@ -22,12 +22,12 @@ bot.on('message', (msg) => bot.sendMessage(msg.chat.id, 'Ok'));
 
 const reloadProxy = () => {
   console.log(`changing proxy...`);
-  exec(`node ./shuffleProxy.js`, function(error, stdout, stderr) {
+  exec(`node ./shuffleProxy.js`, function (error, stdout, stderr) {
     if (error) {
       console.error(`changing proxy error: ${error.message}`);
     } else {
       console.log(`changeProxy stdout: ${stdout}`);
-      console.error(`changeProxy stderr: ${stderr}`);            
+      console.error(`changeProxy stderr: ${stderr}`);
     }
   });
 }
@@ -38,18 +38,18 @@ const checkNewPosts = () => {
     .then(prevPosts => {
       return fetch.rssUpdate()
         .then(result => [result, prevPosts]);
-        // .catch(error => {
-        //   console.error(error);
-        //   return [[], prevPosts];
-        // });
+      // .catch(error => {
+      //   console.error(error);
+      //   return [[], prevPosts];
+      // });
     })
     .then(results => {
       return fetch.htmlUpdate()
         .then(result => [result, ...results]);
-        // .catch(error => {
-        //   console.error(error);
-        //   return [[], ...results];
-        // })
+      // .catch(error => {
+      //   console.error(error);
+      //   return [[], ...results];
+      // })
     })
     .then(results => {
       fetchErrors = 0;
