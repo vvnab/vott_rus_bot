@@ -2,7 +2,14 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 const _ = require('lodash');
 
-require('dotenv').config();
+if (process.env.NODE_ENV === 'production') {
+  require('dotenv').config();
+} else {
+  var path = require("path");
+  var fileName = '.env.' + (process.env.NODE_ENV || 'develop');
+  require('dotenv').config({ path: path.resolve(process.cwd(), fileName) });
+}
+
 
 // Get document, or throw exception on error
 try {

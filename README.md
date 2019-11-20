@@ -9,3 +9,6 @@ https://t.me/vott_rus
     cd vott_rus_bot
     npm install
     npm start
+
+# Настройка
+В файлах `.env` и `.env.develop` описать `TOKEN` и `CHAT_ID`

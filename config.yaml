@@ -4,6 +4,8 @@ common:
   getProxyUrl: 'https://api.getproxylist.com/proxy?protocol=http'
   htmlUrl: 'https://vott.ru'
   rssUrl: 'https://vott.ru/rss.xml'
+  chatId: $CHAT_ID
+  token: $TOKEN
   proxy:
     - '176.104.52.46:47578'
     - '118.172.113.203:8080'
@@ -28,9 +30,5 @@ common:
     - '62.122.18.7:49693'
 develop:
   checkInterval: 90
-  chatId: $CHAT_ID
-  token: $TOKEN
 production:
-  chatId: $CHAT_ID
-  token: $TOKEN
   checkInterval: 600
