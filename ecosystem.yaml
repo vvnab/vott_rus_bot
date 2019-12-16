@@ -1,6 +1,6 @@
 apps:
 - name:             vott_rus_bot
-  cwd:              vott_rus_bot
+  cwd:              .
   script:           index.js
   watch:            ["config.yaml"]
   time: true

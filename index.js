@@ -8,6 +8,10 @@ process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 const { exec } = require('child_process');
 
+var Db = require('tingodb')().Db;
+var db = new Db('.stats', {});
+var stats = db.collection("stats");
+
 let fetchErrors = 0;
 
 // Create a bot that uses 'polling' to fetch new updates
@@ -78,6 +82,13 @@ const checkNewPosts = () => {
       store.saveLastPosts(savePosts);
       var rejectedCount = result.length - sendedPost.length;
       console.log(`success sended and saved ${sendedPost.length}, rejected ${rejectedCount}`);
+      stats.insert({
+        dt: new Date(),
+        proxy: _.last(settings.proxy),
+        result: "OK"
+      }, (err, result) => {
+        // nothing
+      });
       if (rejectedCount >= settings.botErrorsForReloadProxy) {
         reloadProxy();
       }
@@ -86,6 +97,13 @@ const checkNewPosts = () => {
       fetchErrors++;
       console.error(error);
       console.log(`fetch error number ${fetchErrors}, to remain ${settings.fetchErrorsForReloadProxy - fetchErrors}...`);
+      stats.insert({
+        dt: new Date(),
+        proxy: _.last(settings.proxy),
+        result: "ERROR"
+      }, (err, result) => {
+        // nothing
+      });
       if (fetchErrors >= settings.fetchErrorsForReloadProxy) {
         reloadProxy();
       }

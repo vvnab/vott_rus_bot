@@ -1,4 +1,5 @@
 .data/
+.vscode
 node_modules/
 .env
 .env.*
