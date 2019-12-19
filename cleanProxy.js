@@ -38,6 +38,9 @@ stats.find().toArray((err, result) => {
       return i.ok == 0 && i.error > 3;
     }), "proxy");
     console.log("badProxys", badProxys);
+    if (badProxys && badProxys.length == 0) {
+      return;
+    }
     var doc = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8'));
     doc.common.proxy = _.xor(badProxys, doc.common.proxy);
     fs.writeFileSync('./config.yaml', yaml.safeDump(doc));
