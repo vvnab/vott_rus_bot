@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "shuffle": "node shuffleProxy.js",
+    "clean": "node cleanProxy.js"
   },
   "keywords": [],
   "author": "",
