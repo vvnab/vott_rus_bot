@@ -34,11 +34,17 @@ stats.find().toArray((err, result) => {
       return s;
     }, []);
 
-    proxys = _.filter(proxys, (i) => {
-      return i.ok > 0;
-    });
+    var badProxys = _.map(_.filter(proxys, (i) => {
+      return i.ok == 0 && i.error > 3;
+    }), "proxy");
+    console.log("badProxys", badProxys);
     var doc = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8'));
-    doc.common.proxy = _.map(proxys, "proxy");
+    doc.common.proxy = _.xor(badProxys, doc.common.proxy);
     fs.writeFileSync('./config.yaml', yaml.safeDump(doc));
+    stats.remove((err, result) => {
+      if (err) {
+        console.error(err, result);
+      }
+    });
   }
 });
