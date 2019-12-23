@@ -9,6 +9,8 @@ stats.find().toArray((err, result) => {
   if (err) {
     console.error(err, result)
   } else {
+    var doc = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8'));
+
     var proxys = _.reduce(result, (s, i) => {
       var proxy = _.find(s, {proxy: i.proxy});
       var ok = i.result == "OK" ? 1 : 0;
@@ -34,14 +36,14 @@ stats.find().toArray((err, result) => {
       return s;
     }, []);
 
+
     var badProxys = _.map(_.filter(proxys, (i) => {
-      return i.ok == 0 && i.error > 3;
+      return i.ok == 0 && i.error >= doc.common.countErrorsForBadProxy;
     }), "proxy");
     console.log("badProxys", badProxys);
     if (badProxys && badProxys.length == 0) {
       return;
     }
-    var doc = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8'));
     doc.common.proxy = _.xor(badProxys, doc.common.proxy);
     fs.writeFileSync('./config.yaml', yaml.safeDump(doc));
     stats.remove((err, result) => {

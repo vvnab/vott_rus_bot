@@ -1,4 +1,4 @@
-const request = require('request-promise');
+const request = require('request-promise-native');
 const dom = require('xmldom').DOMParser;
 const select = require('xpath.js');
 const _ = require('lodash');
@@ -9,7 +9,8 @@ moment.locale('ru');
 const rssUpdate = async () => {
   return request({
     proxy: "http://" + _.last(settings.proxy),
-    url: settings.rssUrl
+    url: settings.rssUrl,
+    timeout: settings.fetchTimeout
   }).then(result => {
     try {
       const doc = new dom().parseFromString(result);
@@ -35,7 +36,8 @@ const rssUpdate = async () => {
 const htmlUpdate = async () => {
   return request({
     proxy: "http://" + _.last(settings.proxy),
-    url: settings.htmlUrl
+    url: settings.htmlUrl,
+    timeout: settings.fetchTimeout
   }).then(result => {
     const $ = cheerio.load(result);
     const rawPosts = $('div[id^=entry] div[class=entry]');

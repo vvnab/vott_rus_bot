@@ -1,4 +1,4 @@
-var request = require('request-promise');
+var request = require('request-promise-native');
 var fs = require('fs');
 var yaml = require('js-yaml');
 
