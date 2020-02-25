@@ -17,3 +17,4 @@ const composeMessage = post => {
 }
 
 module.exports = composeMessage;
+

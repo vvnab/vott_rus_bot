@@ -8,7 +8,7 @@ moment.locale('ru');
 
 const rssUpdate = async () => {
   return request({
-    proxy: "http://" + _.last(settings.proxy),
+    // proxy: "http://" + _.last(settings.proxy),
     url: settings.rssUrl,
     timeout: settings.fetchTimeout
   }).then(result => {
@@ -35,7 +35,7 @@ const rssUpdate = async () => {
 
 const htmlUpdate = async () => {
   return request({
-    proxy: "http://" + _.last(settings.proxy),
+    // proxy: "http://" + _.last(settings.proxy),
     url: settings.htmlUrl,
     timeout: settings.fetchTimeout
   }).then(result => {

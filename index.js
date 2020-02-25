@@ -2,6 +2,7 @@ require('./utils/loadSettings');
 const _ = require('lodash');
 const store = require('./utils/store');
 const fetch = require('./utils/fetch');
+const request = require('request-promise-native');
 const composeMessage = require('./utils/composeMessage');
 const allSettled = require("promise.allsettled");
 process.env.NTBA_FIX_319 = 1;
@@ -36,6 +37,26 @@ const reloadProxy = () => {
   });
 }
 
+const newBot = {
+  sendMessage(chatId, message, options) {
+    return request({
+      method: "GET",
+      url: settings.gs,
+      timeout: settings.fetchTimeout,
+      // json: true,
+      qs: {
+        bot_token: settings.token,
+        method: "sendMessage",
+        args: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          ...options
+        })
+      }
+    })
+  }
+}
+
 const checkNewPosts = () => {
   store.readLastPosts()
     .bind({})
@@ -63,11 +84,17 @@ const checkNewPosts = () => {
       this.prevPosts = results[2];
       // выполняем слияние
       this.newPosts = _.unionBy(htmlPosts, rssPosts, 'id');
+      this.newPosts.forEach((i, k) => {
+        const rss = rssPosts.find(r => i.id === r.id);
+        if (rss) {
+          i.link = rss.link;
+        }
+      });
       // сравниваем
       this.posts = _.sortBy(_.differenceBy(this.newPosts, this.prevPosts, 'id'), 'id');
       console.log(`success loaded ${this.newPosts.length} post(s), ${this.posts.length} is new`);
       // постим
-      return allSettled(this.posts.map(i => bot.sendMessage(settings.chatId, composeMessage(i), { parse_mode: 'HTML' })))
+      return allSettled(this.posts.map(i => newBot.sendMessage(settings.chatId, composeMessage(i), { parse_mode: 'HTML' })))
     })
     .then(result => {
       result.forEach((i, k) => {
